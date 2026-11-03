@@ -120,6 +120,17 @@ class CalculPrimeTest {
     }
 
     @Test
+    void un_nombre_dannees_de_permis_superieur_a_lage_moins_18_est_refuse() {
+        Conducteur conducteur = new Conducteur(30, 20, 0, 1.00);
+        Vehicule vehicule = new Vehicule(110, false, false);
+
+        IllegalArgumentException erreur = assertThrows(IllegalArgumentException.class,
+                () -> calculPrime.calculerPrime(conducteur, vehicule));
+
+        assertEquals("permis incohérent", erreur.getMessage());
+    }
+
+    @Test
     void un_conducteur_mineur_est_refuse() {
         Conducteur conducteur = new Conducteur(17, 0, 0, 1.00);
         Vehicule vehicule = new Vehicule(110, false, false);
