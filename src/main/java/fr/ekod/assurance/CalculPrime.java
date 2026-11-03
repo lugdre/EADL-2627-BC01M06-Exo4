@@ -66,10 +66,7 @@ public class CalculPrime {
     }
 
     private double majorationSinistres(Conducteur conducteur) {
-        int sinistres = conducteur.sinistresResponsables3Ans();
-        if (sinistres > PLAFOND_SINISTRES) {
-            sinistres = PLAFOND_SINISTRES;
-        }
+        int sinistres = Math.min(conducteur.sinistresResponsables3Ans(), PLAFOND_SINISTRES);
         return sinistres * MAJORATION_PAR_SINISTRE;
     }
 
