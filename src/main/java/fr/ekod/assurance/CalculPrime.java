@@ -9,27 +9,27 @@ public class CalculPrime {
         double x = 0;
 
         if (c.age() >= 18) {
-            if (c.anneesPermis() <= c.age() - 18) {
+            if (c.anneesPermis() <= c.age() - 18) { //Smell jaune
                 if (c.age() < 25) {
                     // majoration jeune
                     tmp = tmp + 0.40;
-                    if (c.anneesPermis() < 3) {
+                    if (c.anneesPermis() < 3) { // Smell jaune
                         // permis recent
                         tmp = tmp + 0.25;
                     }
                     // sinistres
                     int n = c.sinistresResponsables3Ans();
-                    if (n > 3) {
-                        n = 3;
+                    if (n > 3) { // Smell jaune
+                        n = 3; // Smell rouge
                     }
                     tmp = tmp + n * 0.15;
                 } else {
                     if (c.age() > 70) {
                         // majoration senior
                         tmp = tmp + 0.20;
-                        if (c.anneesPermis() < 3) {
+                        if (c.anneesPermis() < 3) { // Smell jaune
                             // senior avec permis recent
-                            tmp = tmp + 0.25;
+                            tmp = tmp + 0.25; // Smell rouge
                         }
                     } else {
                         // conducteur standard
@@ -66,7 +66,7 @@ public class CalculPrime {
                 // bonus-malus
                 p = p * c.coefficientBonusMalus();
             } else {
-                throw new IllegalArgumentException("permis incohérent");
+                throw new IllegalArgumentException("permis incohérent"); // Smell rouge
             }
         } else {
             throw new IllegalArgumentException("conducteur mineur");
