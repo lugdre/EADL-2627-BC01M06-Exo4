@@ -2,76 +2,85 @@ package fr.ekod.assurance;
 
 public class CalculPrime {
 
+    private static final double PRIME_BASE = 500.00;
+
+    private static final int AGE_MINIMUM = 18;
+    private static final int AGE_JEUNE_CONDUCTEUR = 25;
+    private static final int AGE_SENIOR = 70;
+    private static final double MAJORATION_JEUNE = 0.40;
+    private static final double MAJORATION_SENIOR = 0.20;
+
+    private static final int ANCIENNETE_PERMIS_RECENT = 3;
+    private static final double MAJORATION_PERMIS_RECENT = 0.25;
+
+    private static final int PLAFOND_SINISTRES = 3;
+    private static final double MAJORATION_PAR_SINISTRE = 0.15;
+
+    private static final int PUISSANCE_ELEVEE_CH = 150;
+    private static final double MAJORATION_FORTE_PUISSANCE = 0.30;
+
+    private static final double REDUCTION_ELECTRIQUE = 0.10;
+    private static final double REDUCTION_GARAGE_FERME = 0.05;
+
+    private static final double CENTIMES_PAR_EURO = 100;
+
     public double calculerPrime(Conducteur conducteur, Vehicule vehicule) {
-        if (conducteur.age() < 18) {
+        if (conducteur.age() < AGE_MINIMUM) {
             throw new IllegalArgumentException("conducteur mineur");
         }
-        if (conducteur.anneesPermis() > conducteur.age() - 18) {
+        if (conducteur.anneesPermis() > conducteur.age() - AGE_MINIMUM) {
             throw new IllegalArgumentException("permis incohérent");
         }
 
-        double prime = 500;
+        double prime = PRIME_BASE;
         double majorations = 0;
         double reductions = 0;
 
-        if (conducteur.age() < 25) {
-            // majoration jeune
-            majorations = majorations + 0.40;
-            if (conducteur.anneesPermis() < 3) {
-                // permis recent
-                majorations = majorations + 0.25;
+        if (conducteur.age() < AGE_JEUNE_CONDUCTEUR) {
+            majorations = majorations + MAJORATION_JEUNE;
+            if (conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT) {
+                majorations = majorations + MAJORATION_PERMIS_RECENT;
             }
-            // sinistres
             int sinistres = conducteur.sinistresResponsables3Ans();
-            if (sinistres > 3) {
-                sinistres = 3;
+            if (sinistres > PLAFOND_SINISTRES) {
+                sinistres = PLAFOND_SINISTRES;
             }
-            majorations = majorations + sinistres * 0.15;
+            majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
         } else {
-            if (conducteur.age() > 70) {
-                // majoration senior
-                majorations = majorations + 0.20;
-                if (conducteur.anneesPermis() < 3) {
-                    // senior avec permis recent
-                    majorations = majorations + 0.25;
+            if (conducteur.age() > AGE_SENIOR) {
+                majorations = majorations + MAJORATION_SENIOR;
+                if (conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT) {
+                    majorations = majorations + MAJORATION_PERMIS_RECENT;
                 }
             } else {
-                // conducteur standard
-                if (conducteur.anneesPermis() < 3) {
-                    // permis recent
-                    majorations = majorations + 0.25;
+                if (conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT) {
+                    majorations = majorations + MAJORATION_PERMIS_RECENT;
                 }
             }
-            // sinistres
             int sinistres = conducteur.sinistresResponsables3Ans();
-            if (sinistres > 3) {
-                sinistres = 3;
+            if (sinistres > PLAFOND_SINISTRES) {
+                sinistres = PLAFOND_SINISTRES;
             }
-            majorations = majorations + sinistres * 0.15;
+            majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
         }
 
-        // majoration vehicule
-        if (vehicule.puissanceCh() > 150) {
-            majorations = majorations + 0.30;
+        if (vehicule.puissanceCh() > PUISSANCE_ELEVEE_CH) {
+            majorations = majorations + MAJORATION_FORTE_PUISSANCE;
         }
 
-        // application des majorations
         prime = prime * (1 + majorations);
 
-        // reductions
         if (vehicule.electrique()) {
-            reductions = reductions + 0.10;
+            reductions = reductions + REDUCTION_ELECTRIQUE;
         }
         if (vehicule.garageFerme()) {
-            reductions = reductions + 0.05;
+            reductions = reductions + REDUCTION_GARAGE_FERME;
         }
         prime = prime * (1 - reductions);
 
-        // bonus-malus
         prime = prime * conducteur.coefficientBonusMalus();
 
-        // arrondi au centime
-        prime = Math.round(prime * 100) / 100.0;
+        prime = Math.round(prime * CENTIMES_PAR_EURO) / CENTIMES_PAR_EURO;
         return prime;
     }
 }
