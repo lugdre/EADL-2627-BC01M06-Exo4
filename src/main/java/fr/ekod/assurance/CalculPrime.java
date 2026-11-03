@@ -3,77 +3,77 @@ package fr.ekod.assurance;
 public class CalculPrime {
 
     // NE PAS TOUCHER sans prevenir la direction technique (cf. ticket 4512)
-    public double calculerPrime(Conducteur c, Vehicule v) {
-        double p = 500;
-        double tmp = 0;
-        double x = 0;
+    public double calculerPrime(Conducteur conducteur, Vehicule vehicule) {
+        double prime = 500;
+        double majorations = 0;
+        double reductions = 0;
 
-        if (c.age() >= 18) {
-            if (c.anneesPermis() <= c.age() - 18) { //Smell jaune
-                if (c.age() < 25) {
+        if (conducteur.age() >= 18) {
+            if (conducteur.anneesPermis() <= conducteur.age() - 18) {
+                if (conducteur.age() < 25) {
                     // majoration jeune
-                    tmp = tmp + 0.40;
-                    if (c.anneesPermis() < 3) { // Smell jaune
+                    majorations = majorations + 0.40;
+                    if (conducteur.anneesPermis() < 3) {
                         // permis recent
-                        tmp = tmp + 0.25;
+                        majorations = majorations + 0.25;
                     }
                     // sinistres
-                    int n = c.sinistresResponsables3Ans();
-                    if (n > 3) { // Smell jaune
-                        n = 3; // Smell rouge
+                    int sinistres = conducteur.sinistresResponsables3Ans();
+                    if (sinistres > 3) {
+                        sinistres = 3;
                     }
-                    tmp = tmp + n * 0.15;
+                    majorations = majorations + sinistres * 0.15;
                 } else {
-                    if (c.age() > 70) {
+                    if (conducteur.age() > 70) {
                         // majoration senior
-                        tmp = tmp + 0.20;
-                        if (c.anneesPermis() < 3) { // Smell jaune
+                        majorations = majorations + 0.20;
+                        if (conducteur.anneesPermis() < 3) {
                             // senior avec permis recent
-                            tmp = tmp + 0.25; // Smell rouge
+                            majorations = majorations + 0.25;
                         }
                     } else {
                         // conducteur standard
-                        if (c.anneesPermis() < 3) {
+                        if (conducteur.anneesPermis() < 3) {
                             // permis recent
-                            tmp = tmp + 0.25;
+                            majorations = majorations + 0.25;
                         }
                     }
                     // sinistres
-                    int n = c.sinistresResponsables3Ans();
-                    if (n > 3) {
-                        n = 3;
+                    int sinistres = conducteur.sinistresResponsables3Ans();
+                    if (sinistres > 3) {
+                        sinistres = 3;
                     }
-                    tmp = tmp + n * 0.15;
+                    majorations = majorations + sinistres * 0.15;
                 }
 
                 // majoration vehicule
-                if (v.puissanceCh() > 150) {
-                    tmp = tmp + 0.30;
+                if (vehicule.puissanceCh() > 150) {
+                    majorations = majorations + 0.30;
                 }
 
                 // application des majorations
-                p = p * (1 + tmp);
+                prime = prime * (1 + majorations);
 
                 // reductions
-                if (v.electrique()) {
-                    x = x + 0.10;
+                if (vehicule.electrique()) {
+                    reductions = reductions + 0.10;
                 }
-                if (v.garageFerme()) {
-                    x = x + 0.05;
+                if (vehicule.garageFerme()) {
+                    reductions = reductions + 0.05;
                 }
-                p = p * (1 - x);
+                prime = prime * (1 - reductions);
 
                 // bonus-malus
-                p = p * c.coefficientBonusMalus();
+                prime = prime * conducteur.coefficientBonusMalus();
             } else {
-                throw new IllegalArgumentException("permis incohérent"); // Smell rouge
+                throw new IllegalArgumentException("permis incohérent");
             }
         } else {
             throw new IllegalArgumentException("conducteur mineur");
         }
 
         // arrondi au centime
-        p = Math.round(p * 100) / 100.0;
-        return p;
+        prime = Math.round(prime * 100) / 100.0;
+        return prime;
     }
 }
