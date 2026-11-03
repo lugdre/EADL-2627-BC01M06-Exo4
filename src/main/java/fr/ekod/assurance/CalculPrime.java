@@ -25,50 +25,72 @@ public class CalculPrime {
     private static final double CENTIMES_PAR_EURO = 100;
 
     public double calculerPrime(Conducteur conducteur, Vehicule vehicule) {
+        verifierEligibilite(conducteur);
+
+        double majorations = majorationAge(conducteur)
+                + majorationPermisRecent(conducteur)
+                + majorationSinistres(conducteur)
+                + majorationVehicule(vehicule);
+
+        double prime = PRIME_BASE
+                * (1 + majorations)
+                * (1 - reductions(vehicule))
+                * conducteur.coefficientBonusMalus();
+
+        return arrondiAuCentime(prime);
+    }
+
+    private void verifierEligibilite(Conducteur conducteur) {
         if (conducteur.age() < AGE_MINIMUM) {
             throw new IllegalArgumentException("conducteur mineur");
         }
         if (conducteur.anneesPermis() > conducteur.age() - AGE_MINIMUM) {
             throw new IllegalArgumentException("permis incohérent");
         }
+    }
 
-        double prime = PRIME_BASE;
-        double majorations = 0;
-        double reductions = 0;
-
+    private double majorationAge(Conducteur conducteur) {
         if (conducteur.age() < AGE_JEUNE_CONDUCTEUR) {
-            majorations = majorations + MAJORATION_JEUNE;
-        } else if (conducteur.age() > AGE_SENIOR) {
-            majorations = majorations + MAJORATION_SENIOR;
+            return MAJORATION_JEUNE;
         }
-
-        if (conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT) {
-            majorations = majorations + MAJORATION_PERMIS_RECENT;
+        if (conducteur.age() > AGE_SENIOR) {
+            return MAJORATION_SENIOR;
         }
+        return 0;
+    }
 
+    private double majorationPermisRecent(Conducteur conducteur) {
+        return conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT
+                ? MAJORATION_PERMIS_RECENT
+                : 0;
+    }
+
+    private double majorationSinistres(Conducteur conducteur) {
         int sinistres = conducteur.sinistresResponsables3Ans();
         if (sinistres > PLAFOND_SINISTRES) {
             sinistres = PLAFOND_SINISTRES;
         }
-        majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
+        return sinistres * MAJORATION_PAR_SINISTRE;
+    }
 
-        if (vehicule.puissanceCh() > PUISSANCE_ELEVEE_CH) {
-            majorations = majorations + MAJORATION_FORTE_PUISSANCE;
-        }
+    private double majorationVehicule(Vehicule vehicule) {
+        return vehicule.puissanceCh() > PUISSANCE_ELEVEE_CH
+                ? MAJORATION_FORTE_PUISSANCE
+                : 0;
+    }
 
-        prime = prime * (1 + majorations);
-
+    private double reductions(Vehicule vehicule) {
+        double reductions = 0;
         if (vehicule.electrique()) {
             reductions = reductions + REDUCTION_ELECTRIQUE;
         }
         if (vehicule.garageFerme()) {
             reductions = reductions + REDUCTION_GARAGE_FERME;
         }
-        prime = prime * (1 - reductions);
+        return reductions;
+    }
 
-        prime = prime * conducteur.coefficientBonusMalus();
-
-        prime = Math.round(prime * CENTIMES_PAR_EURO) / CENTIMES_PAR_EURO;
-        return prime;
+    private double arrondiAuCentime(double montant) {
+        return Math.round(montant * CENTIMES_PAR_EURO) / CENTIMES_PAR_EURO;
     }
 }
