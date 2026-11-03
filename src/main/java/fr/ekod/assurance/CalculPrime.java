@@ -41,11 +41,6 @@ public class CalculPrime {
             if (conducteur.anneesPermis() < ANCIENNETE_PERMIS_RECENT) {
                 majorations = majorations + MAJORATION_PERMIS_RECENT;
             }
-            int sinistres = conducteur.sinistresResponsables3Ans();
-            if (sinistres > PLAFOND_SINISTRES) {
-                sinistres = PLAFOND_SINISTRES;
-            }
-            majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
         } else {
             if (conducteur.age() > AGE_SENIOR) {
                 majorations = majorations + MAJORATION_SENIOR;
@@ -57,12 +52,13 @@ public class CalculPrime {
                     majorations = majorations + MAJORATION_PERMIS_RECENT;
                 }
             }
-            int sinistres = conducteur.sinistresResponsables3Ans();
-            if (sinistres > PLAFOND_SINISTRES) {
-                sinistres = PLAFOND_SINISTRES;
-            }
-            majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
         }
+
+        int sinistres = conducteur.sinistresResponsables3Ans();
+        if (sinistres > PLAFOND_SINISTRES) {
+            sinistres = PLAFOND_SINISTRES;
+        }
+        majorations = majorations + sinistres * MAJORATION_PAR_SINISTRE;
 
         if (vehicule.puissanceCh() > PUISSANCE_ELEVEE_CH) {
             majorations = majorations + MAJORATION_FORTE_PUISSANCE;
